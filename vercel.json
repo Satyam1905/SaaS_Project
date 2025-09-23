@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "buildCommand": "prisma generate && prisma db push && next build",
+  "outputDirectory": ".next",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "JWT_SECRET": "@jwt_secret"
+  }
+}
