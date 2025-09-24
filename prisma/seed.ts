@@ -1,29 +1,25 @@
-import { PrismaClient, Plan, Role } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { PrismaClient, Plan, Role } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function main() {
+  console.log('🌱 Starting database seed...')
+  
   // Create tenants
   const acme = await prisma.tenant.upsert({
     where: { name: 'Acme' },
     update: {},
-    create: {
-      name: 'Acme',
-      plan: Plan.FREE,
-    },
-  });
+    create: { name: 'Acme', plan: Plan.FREE },
+  })
 
   const globex = await prisma.tenant.upsert({
     where: { name: 'Globex' },
     update: {},
-    create: {
-      name: 'Globex',
-      plan: Plan.FREE,
-    },
-  });
+    create: { name: 'Globex', plan: Plan.FREE },
+  })
 
-  const password = await bcrypt.hash('password', 12);
+  const password = await bcrypt.hash('password', 12)
 
   // Create users for Acme
   await prisma.user.upsert({
@@ -35,7 +31,7 @@ async function main() {
       role: Role.ADMIN,
       tenantId: acme.id,
     },
-  });
+  })
 
   await prisma.user.upsert({
     where: { email: 'user@acme.test' },
@@ -46,7 +42,7 @@ async function main() {
       role: Role.MEMBER,
       tenantId: acme.id,
     },
-  });
+  })
 
   // Create users for Globex
   await prisma.user.upsert({
@@ -58,7 +54,7 @@ async function main() {
       role: Role.ADMIN,
       tenantId: globex.id,
     },
-  });
+  })
 
   await prisma.user.upsert({
     where: { email: 'user@globex.test' },
@@ -69,16 +65,16 @@ async function main() {
       role: Role.MEMBER,
       tenantId: globex.id,
     },
-  });
+  })
 
-  console.log('Database seeded successfully');
+  console.log('✅ Database seeded successfully!')
 }
 
 main()
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.error('❌ Seeding failed:', e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })
